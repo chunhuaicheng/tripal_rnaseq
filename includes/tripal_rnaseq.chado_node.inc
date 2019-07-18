@@ -297,7 +297,7 @@ function chado_rnaseq_insert($node) {
   $record->organism_id = $node->organism_id;
   $status = drupal_write_record('chado_rnaseq', $record);
  
-  // add expression value to chado.feature_experimnt using tripal_job
+  // add expression value to chado.feature_experiment using tripal_job
   if ($node->rnaseq_load == 1) {
     tripal_rnaseq_exp_load_job($node);
   }
@@ -406,7 +406,7 @@ function chado_rnaseq_delete($node) {
   db_query($sql_del, array(':nid' => $node->nid, ':vid' => $node->vid));
 
   $message = "Warning: the RNASeq Expression File ". $node->title ." has been removed from chado_rnaseq table.
-  But the Expression value still in chado.feature_experimnt which needs manually removed.
+  But the Expression value still in chado.feature_experiment which needs manually removed.
   ";
   drupal_set_message($message, 'status');
 } 

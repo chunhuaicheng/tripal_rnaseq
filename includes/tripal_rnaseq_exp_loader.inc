@@ -43,7 +43,7 @@ function tripal_rnaseq_exp_loader($expression_file, $expression_term, $bioprojec
       exit;
     }
 
-    // parse expression file and load to feature_experimnt table
+    // parse expression file and load to feature_experiment table
     $num_seq = 0;
     $num_insert = 0;
     $num_update = 0;
@@ -84,18 +84,18 @@ function tripal_rnaseq_exp_loader($expression_file, $expression_term, $bioprojec
 
       foreach ($exp as $sample_name => $value) {
         $exp_id = $sample_exp[$sample_name];
-        $sql = "SELECT feature_experimnt_id FROM chado.feature_experimnt
+        $sql = "SELECT feature_experiment_id FROM chado.feature_experiment
           WHERE feature_id = :feature_id AND experiment_id = :experiment_id";
         $args = array(':feature_id' => $feature_id, ':experiment_id' => $exp_id);
         $rr = db_query($sql, $args)->fetchAll();       
 
         //  update record for expression
         if (sizeof($rr) == 1) {
-          $feature_exp_id = $rr[0]->feature_experimnt_id;
+          $feature_exp_id = $rr[0]->feature_experiment_id;
 
-          $sql = "SELECT feature_experimntprop_id FROM chado.feature_experimntprop
-          WHERE feature_experimnt_id = :feature_experimnt_id AND type_id = :type_id";
-          $args = array(':feature_experimnt_id' => $feature_exp_id, 
+          $sql = "SELECT feature_experimentprop_id FROM chado.feature_experimentprop
+          WHERE feature_experiment_id = :feature_experiment_id AND type_id = :type_id";
+          $args = array(':feature_experiment_id' => $feature_exp_id, 
             ':type_id' => $expression_term);
           $rrr = db_query($sql, $args)->fetchField(); 
 
@@ -106,45 +106,45 @@ function tripal_rnaseq_exp_loader($expression_file, $expression_term, $bioprojec
               'value' => $value, //this value is expression value
             );
 
-            $update = db_update('chado.feature_experimntprop')
+            $update = db_update('chado.feature_experimentprop')
               ->fields($update_value)
-              ->condition('feature_experimntprop_id', $feature_expprop_id)
+              ->condition('feature_experimentprop_id', $feature_expprop_id)
               ->execute();
 
             if (!$update) {
               watchdog('tripal_rnaseq_exp_loader',
-              'Experiment : can not update record :feature_experimntprop_id', array(':feature_experimntprop_id' => $feature_expprop_id), WATCHDOG_ERROR);
+              'Experiment : can not update record :feature_experimentprop_id', array(':feature_experimentprop_id' => $feature_expprop_id), WATCHDOG_ERROR);
               exit;
             }
 
           } else {
             // insert expression value with expression_term
             $exp_values = array(
-              'feature_experimnt_id' => $rr[0]->feature_experimnt_id,
+              'feature_experiment_id' => $rr[0]->feature_experiment_id,
               'type_id' => $expression_term,
               'value' => $value,
             );
-            $fexp_prop_id = db_insert('chado.feature_experimntprop')->fields($exp_values)->execute();
+            $fexp_prop_id = db_insert('chado.feature_experimentprop')->fields($exp_values)->execute();
           } 
           ++$num_update;
         } 
         // insert new record for expression
         elseif (sizeof($rr) == 0) {
-          // insert feature_experimnt
+          // insert feature_experiment
           $values = array(
             'feature_id' => $feature_id, 
             'experiment_id' => $exp_id,
             'pub_id'  => 0,
           );
-          $feature_exp_id = db_insert('chado.feature_experimnt')->fields($values)->execute();
+          $feature_exp_id = db_insert('chado.feature_experiment')->fields($values)->execute();
 
-          // insert feature_experimntprop
+          // insert feature_experimentprop
           $exp_values = array(
-            'feature_experimnt_id' => $feature_exp_id,
+            'feature_experiment_id' => $feature_exp_id,
             'type_id' => $expression_term,
             'value' => $value, 
           );
-          $fexp_prop_id = db_insert('chado.feature_experimntprop')->fields($exp_values)->execute();
+          $fexp_prop_id = db_insert('chado.feature_experimentprop')->fields($exp_values)->execute();
           ++$num_insert;
         }
         // wrong, more record selected by feature_id and experiment_id

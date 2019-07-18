@@ -82,8 +82,8 @@ function tripal_rnaseq_preprocess_tripal_feature_rnaseq_expression(&$variables) 
       P.project_id, P.name as project_name, 
       S.biomaterial_id, S.name as biosample_name,
       E.experiment_id, E.name as sample_name
-    FROM chado.feature_experimntprop EXP
-    LEFT JOIN chado.feature_experimnt EX ON EXP.feature_experimnt_id = EX.feature_experimnt_id
+    FROM chado.feature_experimentprop EXP
+    LEFT JOIN chado.feature_experiment EX ON EXP.feature_experiment_id = EX.feature_experiment_id
     LEFT JOIN chado.cvterm C ON EXP.type_id = C.cvterm_id
     LEFT JOIN chado.experiment E ON EX.experiment_id = E.experiment_id
     LEFT JOIN chado.biomaterial S ON E.biomaterial_id = S.biomaterial_id
