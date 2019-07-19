@@ -72,7 +72,7 @@ function tripal_rnaseq_exp_loader($expression_file, $expression_term, $bioprojec
     {
       // check feature name, must be exist feature in current database
       $feature_name = array_shift($line);
-      $fr = chado_select_record('feature', array('feature_id'), array('uniquename' => $feature_name));
+      $fr = chado_select_record('feature', array('feature_id'), array('name' => $feature_name));
       if (sizeof($fr) != 1) {
         watchdog('tripal_rnaseq_exp_loader',
           'Can not find feature (Gene/mRNA) :feature from chado', array(':feature' => $feature_name), WATCHDOG_ERROR);

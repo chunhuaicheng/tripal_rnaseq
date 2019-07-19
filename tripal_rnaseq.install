@@ -39,21 +39,42 @@ function tripal_rnaseq_add_custom_tables() {
     'unique keys' => array(
       'c1' => array('experiment_id', 'feature_id', 'pub_id'),
     ),
+    'foreign keys' => array(
+      'experiment_id' => array(
+        'table' => 'experiment',
+        'columns' => array(
+          'experiment_id' => 'experiment_id',
+        ),
+      ),
+      'feature_id' => array(
+        'table' => 'feature',
+        'columns' => array(
+          'feature_id' => 'feature_id',
+        ),
+      ),
+    )
   );
-  db_create_table('chado.feature_experiment', $schema);
-  // Drupal doesn't support FK's. Use SQL command to add them
-  $sql = "
+  if (!db_table_exists('chado.feature_experiment')) {
+    db_create_table('chado.feature_experiment', $schema);
+    // Drupal doesn't support FK's. Use SQL command to add them
+    $sql = "
     ALTER TABLE ONLY chado.feature_experiment
-    ADD CONSTRAINT feature_experiment_experiment_id_fkey 
-    FOREIGN KEY (experiment_id) REFERENCES chado.experiment(experiment_id) 
+    ADD CONSTRAINT feature_experiment_experiment_id_fkey
+    FOREIGN KEY (experiment_id) REFERENCES chado.experiment(experiment_id)
     ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED";
-  db_query($sql);
-  $sql = "
+    db_query($sql);
+    $sql = "
     ALTER TABLE ONLY chado.feature_experiment
     ADD CONSTRAINT feature_experiment_feature_id_fkey
     FOREIGN KEY (feature_id) REFERENCES chado.feature(feature_id)
     ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED";
-  db_query($sql);
+    db_query($sql);
+  }
+  db_query("DELETE FROM {tripal_custom_tables} WHERE table_name = 'feature_experiment'");
+  $record = new stdClass();
+  $record->table_name = 'feature_experiment';
+  $record->schema = serialize($schema);
+  drupal_write_record('tripal_custom_tables', $record);
   
    $schema = array(
     'table' => 'feature_experimentprop',
@@ -72,21 +93,42 @@ function tripal_rnaseq_add_custom_tables() {
     'unique keys' => array(
       'c1' => array('feature_experiment_id', 'type_id', 'rank'),
     ),
+     'foreign keys' => array(
+       'feature_experiment_id' => array(
+         'table' => 'feature_experiment',
+         'columns' => array(
+           'feature_experiment_id' => 'feature_experiment_id',
+         ),
+       ),
+       'type_id' => array(
+         'table' => 'cvterm',
+         'columns' => array(
+           'type_id' => 'cvterm_id',
+         ),
+       ),
+     )
   );
   // Drupal doesn't support FK's. Use SQL command to add them
-  db_create_table('chado.feature_experimentprop', $schema);
-  $sql = "
+   if (!db_table_exists('chado.feature_experimentprop')) {
+    db_create_table('chado.feature_experimentprop', $schema);
+    $sql = "
     ALTER TABLE ONLY chado.feature_experimentprop
     ADD CONSTRAINT feature_experimentprop_feature_experiment_id_fkey
     FOREIGN KEY (feature_experiment_id) REFERENCES chado.feature_experiment(feature_experiment_id)
     ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED";
-  db_query($sql);
-  $sql = "
+    db_query($sql);
+    $sql = "
     ALTER TABLE ONLY chado.feature_experimentprop
     ADD CONSTRAINT feature_experimentprop_type_id_fkey
     FOREIGN KEY (type_id) REFERENCES chado.cvterm(cvterm_id)
     ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED";
-  db_query($sql);
+    db_query($sql);
+   }
+   db_query("DELETE FROM {tripal_custom_tables} WHERE table_name = 'feature_experimentprop'");
+   $record = new stdClass();
+   $record->table_name = 'feature_experimentprop';
+   $record->schema = serialize($schema);
+   drupal_write_record('tripal_custom_tables', $record);
 }
 
 /**

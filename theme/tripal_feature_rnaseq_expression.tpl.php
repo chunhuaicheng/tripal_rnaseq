@@ -2,7 +2,7 @@
 
 $feature = $variables['node']->feature;
 
-if ($feature->type_id->name == 'gene') {
+if ($feature->type_id->name == 'gene' || $feature->type_id->name == 'mRNA') {
 	?>
 	<div class="row">
 		<div class="col-md-8">

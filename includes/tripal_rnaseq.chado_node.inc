@@ -421,6 +421,8 @@ function tripal_rnaseq_node_view($node, $view_mode, $langcode) {
   switch ($node->type) {
       case 'chado_feature':
       if ($view_mode == 'full') {
+        $feature = $node->feature;
+        dpm($feature);
         $node->content['tripal_rnaseq'] = array(
           '#markup' => theme('tripal_feature_rnaseq_expression', array('node' => $node)),
           '#tripal_toc_id' => 'rnaseq_expression',
